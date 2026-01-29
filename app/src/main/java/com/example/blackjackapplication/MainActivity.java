@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     TextView dealerInfo;
     BlackJack blackJack;
 
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
         startGameButton = findViewById(R.id.button3);
         btnGet = findViewById(R.id.button2);
         btnStay = findViewById(R.id.button);
@@ -43,6 +45,20 @@ public class MainActivity extends AppCompatActivity {
 
         blackJack = new BlackJack();
 
+
+
+
+        startGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!blackJack.isGameStarted) {
+                    String[] infoArr = blackJack.gameStart();
+                    info.setText(infoArr[0]);
+                    dealerInfo.setText(infoArr[1]);
+
+                }
+            }
+        });
 
 
         startGameButton.setOnClickListener(new View.OnClickListener() {
