@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     Button btnStay;
     Button startGameButton;
 
+
     TextView info;
     TextView dealerInfo;
     BlackJack blackJack;
@@ -41,22 +42,29 @@ public class MainActivity extends AppCompatActivity {
         btnGet = findViewById(R.id.button2);
         btnStay = findViewById(R.id.button);
         info = findViewById(R.id.textView);
-        dealerInfo = findViewById(R.id.textViewe);
+        dealerInfo = findViewById(R.id.dealer_score);
 
         blackJack = new BlackJack();
 
+//        Path path = new Path();
+
+//        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(diddy,View.X,-100f);
+//        ObjectAnimator objectAnimator1 = ObjectAnimator.ofFloat(diddy,View.Y,100f);
+//        objectAnimator1.setDuration(2000);
+//        objectAnimator.setDuration(2000);
+//        objectAnimator1.start();
+//        objectAnimator.start();
 
 
+        if (!blackJack.isGameStarted) {
+            String[] infoArr = blackJack.gameStart();
+            info.setText(infoArr[0]);
+            dealerInfo.setText(infoArr[1]);
+        }
 
         startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!blackJack.isGameStarted) {
-                    String[] infoArr = blackJack.gameStart();
-                    info.setText(infoArr[0]);
-                    dealerInfo.setText(infoArr[1]);
-
-                }
             }
         });
 
@@ -98,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
 
 
 
