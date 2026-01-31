@@ -14,14 +14,21 @@ public class BlackJack {
 
 
 
-    public String[] gameStart(){
+    public int gameStartDealer(){
         reClearStats();
         isGameStarted = true;
         DEALER.secretCard = getCard();
         DEALER.points+=getCard().value;
-        PLAYER.points+=getCard().value;
-        return new String[]{String.valueOf(PLAYER.points),String.valueOf(DEALER.points)};
+        return DEALER.points;
     }
+    public Cards gameStartPlayer(){
+        if (isGameStarted){
+            Cards firstCard = getCard();
+            return firstCard;
+        }
+        return null;
+    }
+
     private void reClearStats(){
         Cards.init();
         DEALER.secretCard = getCard();
@@ -61,19 +68,28 @@ public class BlackJack {
     }
 
 
-    public String getLogic(){
+    boolean IfDeckIsFull;
+    public int[] getLogic(){
         if (isGameStarted) {
             Random random = new Random(3);
             if (random.nextInt() > 3) {
                 DEALER.points += getCard().value;
             }
+            Cards card = getCard();
+
             if (PLAYER.points <= 21) {
-                PLAYER.points += getCard().value;
+                PLAYER.points += card.value;
+                IfDeckIsFull = false;
             }
-            return String.valueOf(PLAYER.points);
+            else {
+                IfDeckIsFull = true;
+            }
+            return new int[]{PLAYER.points,card.cardID};
         }
         return null;
     }
+
+
 
 
 
