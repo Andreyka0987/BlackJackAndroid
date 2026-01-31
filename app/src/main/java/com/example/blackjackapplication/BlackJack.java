@@ -14,17 +14,17 @@ public class BlackJack {
 
 
 
-    public int gameStartDealer(){
+    public void gameStartDealer(){
         reClearStats();
         isGameStarted = true;
         DEALER.secretCard = getCard();
-        DEALER.points+=getCard().value;
-        return DEALER.points;
     }
-    public Cards gameStartPlayer(){
+    public void addSecretCard(){DEALER.points+=DEALER.secretCard.value;}
+    public int[] gameStartPlayer(){
         if (isGameStarted){
             Cards firstCard = getCard();
-            return firstCard;
+            PLAYER.points += firstCard.value;
+            return new int[] {firstCard.cardID,PLAYER.points};
         }
         return null;
     }
@@ -41,7 +41,7 @@ public class BlackJack {
 
     }
 
-    private Cards getCard(){
+    public Cards getCard(){
         Random random = new Random();
         int cardIndex = random.nextInt(deck.size());
         Cards returnCard = deck.get(cardIndex);
@@ -52,19 +52,66 @@ public class BlackJack {
     public String stayLogic(){
 
         isGameStarted = false;
-        DEALER.points += DEALER.secretCard.value;
 
-        if (DEALER.points > PLAYER.points || PLAYER.points > 21 && PLAYER.points > DEALER.points) {
+
+        if (DEALER.points > PLAYER.points && PLAYER.points <= 21
+                && DEALER.points <=21 || PLAYER.points > 21 && DEALER.points < 21 ||
+                PLAYER.points > 21 && DEALER.points > 21 && DEALER.points < PLAYER.points) {
             return "You Lost";
         }
-        if (DEALER.points < PLAYER.points) {
+        if (DEALER.points < PLAYER.points  && PLAYER.points <= 21 || PLAYER.points < 21 && DEALER.points > 21 ||
+                PLAYER.points > 21 && DEALER.points > 21 && DEALER.points > PLAYER.points) {
             return "You won";
         }
         reClearStats();
 
         return "draw";
 
+    }
+    public boolean dealersLogic(Cards cards){
+        boolean isGotACard = false;
 
+        if (DEALER.points >= 15 && DEALER.points+cards.value <= 21){
+            Random random = new Random();
+            int randomNum = random.nextInt(100);
+            if (randomNum <= 10){
+                DEALER.points +=cards.value;
+                isGotACard = true;
+            }
+
+        }
+        if (DEALER.points == 14 && DEALER.points+cards.value <= 21){
+            Random random = new Random();
+            int randomNum = random.nextInt(100);
+            if (randomNum <= 30){
+                DEALER.points +=cards.value;
+                isGotACard = true;
+            }
+
+        }
+        if (DEALER.points == 13 && DEALER.points+cards.value <= 21){
+            Random random = new Random();
+            int randomNum = random.nextInt(100);
+            if (randomNum <= 50){
+                DEALER.points +=cards.value;
+                isGotACard = true;
+            }
+        }
+        if (DEALER.points == 12){
+            Random random = new Random();
+            int randomNum = random.nextInt(100);
+            if (randomNum <= 80){
+                DEALER.points +=cards.value;
+                isGotACard = true;
+            }
+        }
+        if (DEALER.points <= 11){
+            DEALER.points+=cards.value;
+            isGotACard = true;
+        }
+
+
+        return isGotACard;
     }
 
 
@@ -89,12 +136,5 @@ public class BlackJack {
         return null;
     }
 
-
-
-
-
-
-
-
-
+    public Dealer getDEALER() {return DEALER;}
 }

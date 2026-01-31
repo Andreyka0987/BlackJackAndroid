@@ -21,27 +21,27 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.sql.Time;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final int CARD_PARAMS_WIDTH = 225;
-    private final int CARD_PARAMS_HEIGHT = 370;
+    public static final int DEFAULT_DECKS_X = 332;
+    public static final int DEFAULT_DECKS_Y = 300;
+    private final int PLAYER_CARD_PARAMS_WIDTH = 225;
+    private final int PLAYER_CARD_PARAMS_HEIGHT = 370;
     Context mainContext = this;
     ConstraintLayout mainLayout;
     LinearLayout playerDeck;
+    LinearLayout dealersDeck;
     Button btnGet;
     Button btnStay;
-    Button startGameButton;
+    Button btnRestart;
+    Button btnLeaveToMainMenu;
     ScrollView deckScroll;
-
     ImageView newImage;
-
-    TextView info;
-    TextView dealerInfo;
+    TextView playerInfoBar;
+    TextView winBar;
     BlackJack blackJack;
 
 
@@ -59,14 +59,24 @@ public class MainActivity extends AppCompatActivity {
 
 
         playerDeck = findViewById(R.id.players_deck);
+        dealersDeck = findViewById(R.id.dealers_deck);
         mainLayout = findViewById(R.id.main);
-        startGameButton = findViewById(R.id.button3);
+
+        btnLeaveToMainMenu = findViewById(R.id.leaveToMainMenu_btn);
+        btnRestart = findViewById(R.id.restartGame_btn);
+        winBar = findViewById(R.id.winOrLost_text);
+
         btnGet = findViewById(R.id.button2);
         btnStay = findViewById(R.id.button);
-        info = findViewById(R.id.textView);
-        dealerInfo = findViewById(R.id.dealer_score);
+        playerInfoBar = findViewById(R.id.textView);
+
 
         blackJack = new BlackJack();
+
+        winBar.setVisibility(View.INVISIBLE);
+        playerInfoBar.setVisibility(View.INVISIBLE);
+        btnRestart.setVisibility(View.INVISIBLE);
+        btnLeaveToMainMenu.setVisibility(View.INVISIBLE);
 
 //        Path path = new Path();
 
@@ -78,48 +88,85 @@ public class MainActivity extends AppCompatActivity {
 //        objectAnimator.start();
 
 
+        ImageView secretCardInstance = null;
         if (!blackJack.isGameStarted) {
-            int dealersStarterPoints = blackJack.gameStartDealer();
-            dealerInfo.setText(String.valueOf(dealersStarterPoints));
-            Cards playerCard = blackJack.gameStartPlayer();
+            blackJack.gameStartDealer();
+            blackJack.addSecretCard();
+            int[] playerInfoArr = blackJack.gameStartPlayer();
+            playerInfoBar.setText(String.valueOf(playerInfoArr[1]));
 
 
             ImageView firstCard = new ImageView(this);
-            firstCard.setImageResource(playerCard.cardID);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CARD_PARAMS_WIDTH,CARD_PARAMS_HEIGHT);
+            firstCard.setImageResource(playerInfoArr[0]);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(PLAYER_CARD_PARAMS_WIDTH, PLAYER_CARD_PARAMS_HEIGHT);
             playerDeck.addView(firstCard,params);
 
+           secretCardInstance = animationDealerCard(705f,795f,false);
         }
 
-        startGameButton.setOnClickListener(new View.OnClickListener() {
+        btnRestart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                startActivity(intent);
-
-
-
-                animationPlayerCard(R.drawable.back_card_vertical);
-
-                ImageView newCard = new ImageView(mainContext);
-                newCard.setImageResource(R.drawable.efn_k);
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(220,370);
-                playerDeck.addView(newCard,params);
-
-
+                Intent restartIntent = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(restartIntent);
+            }
+        });
+        btnLeaveToMainMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainMenuIntent = new Intent(MainActivity.this,EntryActivity.class);
+                startActivity(mainMenuIntent);
             }
         });
 
 
+        ImageView finalSecretCardInstance = secretCardInstance;
         btnStay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (blackJack.isGameStarted) {
-                    info.setText(blackJack.stayLogic());
-                    String[] infoArr = blackJack.reUpdateStats();
-                    dealerInfo.setText(infoArr[1]);
+
+
+                    while (true){
+                        Cards card = blackJack.getCard();
+                        boolean statementOfDealer = blackJack.dealersLogic(card);
+
+                        if (statementOfDealer){
+                            animationDealerCard(700f,400f,true);
+
+                            new Handler(Looper.getMainLooper()).postDelayed(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    ImageView cardView = new ImageView(mainContext);
+                                    cardView.setImageResource(card.cardID);
+                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(PLAYER_CARD_PARAMS_WIDTH,PLAYER_CARD_PARAMS_HEIGHT);
+                                    dealersDeck.addView(cardView,params);
+
+                                }
+                            },1000);
+                        } else {break;}
+
+                    }
+
+                    new Handler(Looper.getMainLooper()).postDelayed(new TimerTask() {
+                        @Override
+                        public void run() {
+                            finalSecretCardInstance.setImageResource(blackJack.getDEALER().secretCard.cardID);
+                        }
+                    },2000);
+
+
+
+                    new Handler(Looper.getMainLooper()).postDelayed(new TimerTask() {
+                        @Override
+                        public void run() {
+                            winBar.setVisibility(View.VISIBLE);
+                            btnRestart.setVisibility(View.VISIBLE);
+                            btnLeaveToMainMenu.setVisibility(View.VISIBLE);
+                            winBar.setText(blackJack.stayLogic());
+                        }
+                    },3000);
+
                 }
             }
         });
@@ -131,11 +178,11 @@ public class MainActivity extends AppCompatActivity {
                 if (blackJack.isGameStarted) {
                     int[] dataArr = blackJack.getLogic();
                     boolean ifDeckIsFull = blackJack.IfDeckIsFull;
-                    info.setText(String.valueOf(dataArr[0]));
+                    playerInfoBar.setText(String.valueOf(dataArr[0]));
 
                     if (!ifDeckIsFull) {
                         ImageView newCard = new ImageView(mainContext);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CARD_PARAMS_WIDTH, CARD_PARAMS_HEIGHT);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(PLAYER_CARD_PARAMS_WIDTH, PLAYER_CARD_PARAMS_HEIGHT);
                         playerDeck.addView(newCard, params);
 
                         animationPlayerCard(R.drawable.back_card);
@@ -161,8 +208,8 @@ public class MainActivity extends AppCompatActivity {
         card.setImageResource(cardID);
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(420,400);
         mainLayout.addView(card,params);
-        card.setX(332);
-        card.setY(300);
+        card.setX(DEFAULT_DECKS_X);
+        card.setY(DEFAULT_DECKS_Y);
 
         ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(card,"translationY",1650f);
         objectAnimator.setDuration(700);
@@ -172,6 +219,35 @@ public class MainActivity extends AppCompatActivity {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {card.setVisibility(View.INVISIBLE);}},700);
+    }
+    public ImageView animationDealerCard(float socketY, float socketX, boolean isNeedToBeHidden){
+        ImageView card = new ImageView(mainContext);
+        card.setImageResource(R.drawable.back_card_vertical);
+        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(PLAYER_CARD_PARAMS_WIDTH,PLAYER_CARD_PARAMS_HEIGHT);
+        mainLayout.addView(card,params);
+        card.setX(DEFAULT_DECKS_X+99);
+        card.setY(DEFAULT_DECKS_Y);
+
+
+        ObjectAnimator objectAnimatorY = ObjectAnimator.ofFloat(card,"translationY",socketY);
+        objectAnimatorY.setDuration(500);
+        objectAnimatorY.start();
+        ObjectAnimator objectAnimatorX = ObjectAnimator.ofFloat(card,"translationX",socketX);
+        objectAnimatorX.setDuration(500);
+        objectAnimatorX.start();
+
+        if (isNeedToBeHidden) {
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    card.setVisibility(View.INVISIBLE);
+                }
+            }, 1000);
+        }
+
+
+        return card;
     }
 
 

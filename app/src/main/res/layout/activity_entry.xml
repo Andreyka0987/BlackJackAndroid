@@ -6,15 +6,47 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
+
     tools:context=".EntryActivity">
 
-    <Button
-        android:id="@+id/btn_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start Game"
+    <ImageView
+        android:id="@+id/infoIcon_btn"
+        android:layout_width="67dp"
+        android:layout_height="66dp"
+        android:elevation="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@android:drawable/ic_menu_info_details" />
+
+    <VideoView
+        android:id="@+id/mainVideo"
+        android:layout_width="412dp"
+        android:layout_height="560dp"
+        android:elevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.402" />
+
+    <Button
+        android:id="@+id/btn_start"
+        android:layout_width="260dp"
+        android:layout_height="49dp"
+        android:backgroundTint="#3949AB"
+        android:elevation="10dp"
+        android:text="Start Game"
+        app:layout_constraintBottom_toBottomOf="@+id/mainVideo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:strokeColor="#00B8D4"
+        app:strokeWidth="3dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
