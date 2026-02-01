@@ -14,6 +14,7 @@ public class Cards {
 
 
     public static void init(){
+        BlackJack.deck.clear();
 
         Cards clubsTwo = new Cards("clubs_two",2,R.drawable.charlie_2);
         Cards clubsThree = new Cards("clubs_three",3,R.drawable.charlie_3);

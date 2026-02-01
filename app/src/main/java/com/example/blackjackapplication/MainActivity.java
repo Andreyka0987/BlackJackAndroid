@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int DEFAULT_DECKS_Y = 300;
     private final int PLAYER_CARD_PARAMS_WIDTH = 225;
     private final int PLAYER_CARD_PARAMS_HEIGHT = 370;
-    Context mainContext = this;
+     Context mainContext = this;
     ConstraintLayout mainLayout;
     LinearLayout playerDeck;
     LinearLayout dealersDeck;
@@ -78,16 +78,6 @@ public class MainActivity extends AppCompatActivity {
         btnRestart.setVisibility(View.INVISIBLE);
         btnLeaveToMainMenu.setVisibility(View.INVISIBLE);
 
-//        Path path = new Path();
-
-//        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(diddy,View.X,-100f);
-//        ObjectAnimator objectAnimator1 = ObjectAnimator.ofFloat(diddy,View.Y,100f);
-//        objectAnimator1.setDuration(2000);
-//        objectAnimator.setDuration(2000);
-//        objectAnimator1.start();
-//        objectAnimator.start();
-
-
         ImageView secretCardInstance = null;
         if (!blackJack.isGameStarted) {
             blackJack.gameStartDealer();
@@ -101,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(PLAYER_CARD_PARAMS_WIDTH, PLAYER_CARD_PARAMS_HEIGHT);
             playerDeck.addView(firstCard,params);
 
-           secretCardInstance = animationDealerCard(705f,795f,false);
+           secretCardInstance = animationDealerCard(760f,780f,false);
         }
 
         btnRestart.setOnClickListener(new View.OnClickListener() {
@@ -160,6 +150,8 @@ public class MainActivity extends AppCompatActivity {
                     new Handler(Looper.getMainLooper()).postDelayed(new TimerTask() {
                         @Override
                         public void run() {
+                            btnGet.setVisibility(View.INVISIBLE);
+                            btnStay.setVisibility(View.INVISIBLE);
                             winBar.setVisibility(View.VISIBLE);
                             btnRestart.setVisibility(View.VISIBLE);
                             btnLeaveToMainMenu.setVisibility(View.VISIBLE);
@@ -177,10 +169,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (blackJack.isGameStarted) {
                     int[] dataArr = blackJack.getLogic();
-                    boolean ifDeckIsFull = blackJack.IfDeckIsFull;
-                    playerInfoBar.setText(String.valueOf(dataArr[0]));
+                    // return number of players points was used to set label with these
 
-                    if (!ifDeckIsFull) {
+                    if (blackJack.counterOfGottenCards != 10) {
                         ImageView newCard = new ImageView(mainContext);
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(PLAYER_CARD_PARAMS_WIDTH, PLAYER_CARD_PARAMS_HEIGHT);
                         playerDeck.addView(newCard, params);

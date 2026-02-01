@@ -1,5 +1,7 @@
 package com.example.blackjackapplication;
 
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -8,7 +10,7 @@ public class BlackJack {
     boolean isGameStarted = false;
     private final Dealer DEALER = new Dealer();
     private final Player PLAYER = new Player();
-    static ArrayList<Cards> deck = new ArrayList<>();
+    static final ArrayList<Cards> deck = new ArrayList<>();
 
     public BlackJack(){reClearStats();}
 
@@ -31,14 +33,8 @@ public class BlackJack {
 
     private void reClearStats(){
         Cards.init();
-        DEALER.secretCard = getCard();
         DEALER.points = 0;
         PLAYER.points = 0;
-    }
-    public String[] reUpdateStats(){
-        return new String[]{String.valueOf(PLAYER.points),String.valueOf(DEALER.points)};
-
-
     }
 
     public Cards getCard(){
@@ -116,22 +112,18 @@ public class BlackJack {
 
 
     boolean IfDeckIsFull;
+
+    int counterOfGottenCards = 0;
     public int[] getLogic(){
         if (isGameStarted) {
-            Random random = new Random(3);
-            if (random.nextInt() > 3) {
-                DEALER.points += getCard().value;
-            }
-            Cards card = getCard();
-
-            if (PLAYER.points <= 21) {
+            if (counterOfGottenCards != 10) {
+                counterOfGottenCards++;
+                Cards card = getCard();
                 PLAYER.points += card.value;
                 IfDeckIsFull = false;
+
+                return new int[]{PLAYER.points, card.cardID};
             }
-            else {
-                IfDeckIsFull = true;
-            }
-            return new int[]{PLAYER.points,card.cardID};
         }
         return null;
     }

@@ -56,12 +56,14 @@
 
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
-        android:layout_width="425dp"
-        android:layout_height="133dp"
+        android:layout_width="309dp"
+        android:layout_height="112dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.47"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.98">
 
         <LinearLayout
             android:id="@+id/players_deck"
@@ -72,8 +74,8 @@
 
     <ImageView
         android:id="@+id/back_card3"
-        android:layout_width="244dp"
-        android:layout_height="116dp"
+        android:layout_width="124dp"
+        android:layout_height="93dp"
         android:layout_marginTop="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
