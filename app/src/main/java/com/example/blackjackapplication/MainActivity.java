@@ -112,44 +112,41 @@ public class MainActivity extends AppCompatActivity {
         String moneyString;
         try {
             FileInputStream checkIsNullFileInput = openFileInput("money.txt");
-            if (checkIsNullFileInput == null){
-                try {
-                    // create new instance of file
-                    FileOutputStream newFileOutPut = openFileOutput("money.txt",MODE_PRIVATE);
 
-                    //entering base balance
-                    FileInputStream fileInputStream = openFileInput("money.txt");
-                    InputStreamReader streamReader = new InputStreamReader(fileInputStream);
-                    BufferedReader bufferedReader = new BufferedReader(streamReader);
-
-                    moneyString = bufferedReader.readLine();
-
-
-                    if (moneyString == null){
-                        newFileOutPut.write("0".getBytes());
-                        moneyString = bufferedReader.readLine();
-                    }
-
-                    balanceView.setText(String.valueOf(moneyString));
-
-                    Player.money = Integer.parseInt(balanceView.getText().toString());
-
-                    newFileOutPut.close();
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-
-                }
-            }
-            else {
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(checkIsNullFileInput));
                     String temp = String.valueOf(bufferedReader.readLine());
                     balanceView.setText(temp);
                     Player.money = Integer.parseInt(temp);
                     checkIsNullFileInput.close();
-            }
+
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            // create new instance of file
+            FileOutputStream newFileOutPut = null;
+            try {
+                newFileOutPut = openFileOutput("money.txt",MODE_PRIVATE);
+
+            //entering base balance
+            FileInputStream fileInputStream = openFileInput("money.txt");
+            InputStreamReader streamReader = new InputStreamReader(fileInputStream);
+            BufferedReader bufferedReader = new BufferedReader(streamReader);
+
+            moneyString = bufferedReader.readLine();
+
+
+            if (moneyString == null){
+                newFileOutPut.write("0".getBytes());
+                moneyString = bufferedReader.readLine();
+            }
+
+            balanceView.setText(String.valueOf(moneyString));
+
+            Player.money = Integer.parseInt(balanceView.getText().toString());
+
+            newFileOutPut.close();
+            fileInputStream.close();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
         }
 
 
