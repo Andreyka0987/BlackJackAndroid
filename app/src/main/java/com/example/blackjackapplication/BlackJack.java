@@ -8,8 +8,8 @@ import java.util.Random;
 public class BlackJack {
 
     boolean isGameStarted = false;
-    private final Dealer DEALER = new Dealer();
-    private final Player PLAYER = new Player();
+    private  Dealer DEALER = new Dealer();
+    private  Player PLAYER = new Player();
     static final ArrayList<Cards> deck = new ArrayList<>();
 
     public BlackJack(){reClearStats();}
@@ -128,5 +128,6 @@ public class BlackJack {
         return null;
     }
 
+    public Player getPLAYER() {return PLAYER;}
     public Dealer getDEALER() {return DEALER;}
 }

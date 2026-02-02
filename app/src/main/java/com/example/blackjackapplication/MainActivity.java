@@ -12,7 +12,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +23,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,10 +47,11 @@ public class MainActivity extends AppCompatActivity {
     Button btnStay;
     Button btnRestart;
     Button btnLeaveToMainMenu;
-    ScrollView deckScroll;
-    ImageView newImage;
+    SeekBar amountOfMoneyBar;
+    ImageView moneyInBtn;
     TextView playerInfoBar;
     TextView winBar;
+    TextView balanceView;
     BlackJack blackJack;
 
 
@@ -62,9 +72,12 @@ public class MainActivity extends AppCompatActivity {
         dealersDeck = findViewById(R.id.dealers_deck);
         mainLayout = findViewById(R.id.main);
 
+        moneyInBtn = findViewById(R.id.moneyIn_btn);
         btnLeaveToMainMenu = findViewById(R.id.leaveToMainMenu_btn);
         btnRestart = findViewById(R.id.restartGame_btn);
         winBar = findViewById(R.id.winOrLost_text);
+        balanceView = findViewById(R.id.money_view);
+        amountOfMoneyBar = findViewById(R.id.amoutOfMoney_seekBar);
 
         btnGet = findViewById(R.id.button2);
         btnStay = findViewById(R.id.button);
@@ -94,32 +107,79 @@ public class MainActivity extends AppCompatActivity {
            secretCardInstance = animationDealerCard(760f,780f,false);
         }
 
+
+        // Balance check
+        String moneyString;
+        try {
+            FileInputStream checkIsNullFileInput = openFileInput("money.txt");
+            if (checkIsNullFileInput == null){
+                try {
+                    // create new instance of file
+                    FileOutputStream newFileOutPut = openFileOutput("money.txt",MODE_PRIVATE);
+
+                    //entering base balance
+                    FileInputStream fileInputStream = openFileInput("money.txt");
+                    InputStreamReader streamReader = new InputStreamReader(fileInputStream);
+                    BufferedReader bufferedReader = new BufferedReader(streamReader);
+
+                    moneyString = bufferedReader.readLine();
+
+
+                    if (moneyString == null){
+                        newFileOutPut.write("0".getBytes());
+                        moneyString = bufferedReader.readLine();
+                    }
+
+                    balanceView.setText(String.valueOf(moneyString));
+
+                    Player.money = Integer.parseInt(balanceView.getText().toString());
+
+                    newFileOutPut.close();
+                    fileInputStream.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+
+                }
+            }
+            else {
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(checkIsNullFileInput));
+                    String temp = String.valueOf(bufferedReader.readLine());
+                    balanceView.setText(temp);
+                    Player.money = Integer.parseInt(temp);
+                    checkIsNullFileInput.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
+        // Entering activities
+        moneyInBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {Intent intent = new Intent(MainActivity.this,MoneyEarningActivity.class);startActivity(intent);}});
         btnRestart.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent restartIntent = new Intent(MainActivity.this, MainActivity.class);
-                startActivity(restartIntent);
-            }
-        });
+            public void onClick(View v) {Intent restartIntent = new Intent(MainActivity.this, MainActivity.class);startActivity(restartIntent);}});
         btnLeaveToMainMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent mainMenuIntent = new Intent(MainActivity.this,EntryActivity.class);
-                startActivity(mainMenuIntent);
-            }
-        });
+                startActivity(mainMenuIntent);}});
 
 
         ImageView finalSecretCardInstance = secretCardInstance;
         btnStay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                moneyInBtn.setVisibility(View.INVISIBLE);
+
                 if (blackJack.isGameStarted) {
-
-
+                    int  finalAmountOfMoneyThePlayerHasBet = (int) Math.ceil(fractionOfProgressBar()*Player.money);
                     while (true){
                         Cards card = blackJack.getCard();
                         boolean statementOfDealer = blackJack.dealersLogic(card);
+
 
                         if (statementOfDealer){
                             animationDealerCard(700f,400f,true);
@@ -133,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                                     dealersDeck.addView(cardView,params);
 
                                 }
-                            },1000);
+                            },660);
                         } else {break;}
 
                     }
@@ -143,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                         public void run() {
                             finalSecretCardInstance.setImageResource(blackJack.getDEALER().secretCard.cardID);
                         }
-                    },2000);
+                    },1500);
 
 
 
@@ -155,9 +215,27 @@ public class MainActivity extends AppCompatActivity {
                             winBar.setVisibility(View.VISIBLE);
                             btnRestart.setVisibility(View.VISIBLE);
                             btnLeaveToMainMenu.setVisibility(View.VISIBLE);
-                            winBar.setText(blackJack.stayLogic());
+                            String result = blackJack.stayLogic();
+                            winBar.setText(result);
+                            if (result.equals("You won")){
+                                Player.money+=finalAmountOfMoneyThePlayerHasBet/2;
+                            }
+                            if (result.equals("You Lost")) {
+                                Player.money -= finalAmountOfMoneyThePlayerHasBet;
+
+                            }
+                            try {
+
+                                FileOutputStream fileOutputStream = openFileOutput("money.txt",MODE_PRIVATE);
+                                fileOutputStream.write(String.valueOf(Player.money).getBytes());
+                                fileOutputStream.close();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+
+
                         }
-                    },3000);
+                    },2500);
 
                 }
             }
@@ -167,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
         btnGet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (blackJack.isGameStarted) {
                     int[] dataArr = blackJack.getLogic();
                     // return number of players points was used to set label with these
@@ -234,13 +313,13 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     card.setVisibility(View.INVISIBLE);
                 }
-            }, 1000);
+            }, 650);
         }
 
 
         return card;
     }
-
+    public float fractionOfProgressBar(){return (float)amountOfMoneyBar.getProgress()/amountOfMoneyBar.getMax();}
 
 
 

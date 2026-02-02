@@ -58,7 +58,7 @@ public class EntryActivity extends AppCompatActivity {
                     videoView.start();
                 }
             }
-        },2000,500);
+        },1500,500);
 
 
 
